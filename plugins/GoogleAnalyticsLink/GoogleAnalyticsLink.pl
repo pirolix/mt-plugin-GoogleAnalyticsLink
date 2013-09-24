@@ -23,7 +23,7 @@ my $plugin = __PACKAGE__->new ({
     version => $VERSION,
     author_name => 'Open MagicVox.net',
     author_link => 'http://www.magicvox.net/',
-    plugin_link => 'http://www.magicvox.net/archive/YYYY/MMDDhhmm/', # Blog
+    plugin_link => 'http://www.magicvox.net/archive/2013/09241517/', # Blog
     doc_link => "http://lab.magicvox.net/trac/mt-plugins/wiki/$MYNAME", # tracWiki
     description => <<'HTMLHEREDOC',
 <__trans phrase="Add some useful links to investigate the pages with Google Analytics.">
@@ -59,7 +59,7 @@ sub init_registry {
     6.0 <= MT->version_number
         and return;
 
-    #
+    # Inject a sub menu
     my $title = MT->registry ('list_properties', 'entry', 'title');
     push @{$title->{sub_fields}}, {
         class => 'galink_class',
@@ -67,7 +67,7 @@ sub init_registry {
         display => 'default',
     };
 
-    #
+    # Modify the original method's output
     my $orig_html = $title->{html};
     $title->{html} = sub {
         my ($prop, $obj) = @_;
@@ -77,10 +77,12 @@ sub init_registry {
             (my $pagePath = $obj->permalink) =~ s!^https?://.+?/!/!;
             $pagePath = MT::Util::encode_url($pagePath);
 
+            my $static_uri = MT->static_path;
             my $old = quotemeta qq{<p class="excerpt description"};
             my $add = &instance->translate_templatized(<<"HTMLHEREDOC");
 <span class="galink_class">
-    <a href="https://www.google.com/analytics/web/?hl=ja&pli=1#report/content-pages/${awp}/%3Fexplorer-table.plotKeys%3D[]%26_r.drilldown%3Danalytics.pagePath%3A${pagePath}/"><img src="mt-static/plugins/chart_s.png" alt="<__trans phrase="Investigate with Google Analytics">" /></a>
+  <a href="https://www.google.com/analytics/web/?hl=ja&pli=1#report/content-pages/${awp}/%3Fexplorer-table.plotKeys%3D[]%26_r.drilldown%3Danalytics.pagePath%3A${pagePath}/">
+    <img src="${static_uri}plugins/$VENDOR/$MYNAME/chart_s.png" alt="<__trans phrase="Investigate with Google Analytics">" /></a>
 </span>
 HTMLHEREDOC
             unless ($out =~ s/($old)/$add$1/) {
