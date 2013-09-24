@@ -12,7 +12,7 @@ use vars qw( $VENDOR $MYNAME $FULLNAME $VERSION );
 $FULLNAME = join '::',
         (($VENDOR, $MYNAME) = (split /::/, __PACKAGE__)[-2, -1]);
 (my $revision = '$Rev$') =~ s/\D//g;
-$VERSION = 'v0.10'. ($revision ? ".$revision" : '');
+$VERSION = 'v0.11'. ($revision ? ".$revision" : '');
 
 use base qw( MT::Plugin );
 my $plugin = __PACKAGE__->new ({
@@ -34,6 +34,7 @@ HTMLHEREDOC
     blog_config_template => "$VENDOR/$MYNAME/config.tmpl",
     settings => new MT::PluginSettings ([
         [ 'awp', { Default => undef, scope => 'blog' } ],
+        [ 'index', { Default => undef, scope => 'blog' } ],
     ]),
 
     registry => {
@@ -74,7 +75,11 @@ sub init_registry {
         my $out = $orig_html->(@_);
 
         if (my $awp = &instance->get_config_value('awp', 'blog:'. $obj->blog_id)) {
-            (my $pagePath = $obj->permalink) =~ s!^https?://.+?/!/!;
+            (my $pagePath = $obj->permalink) =~ s!^https?://.+?/!/!;    # omit domain part
+            if ($pagePath =~ m!/$!) {
+                my $index = MT::Util::trim( &instance->get_config_value( 'index', 'blog:'. $obj->blog_id ) || '' );
+                $pagePath .= $index;
+            }
             $pagePath = MT::Util::encode_url($pagePath);
 
             my $static_uri = MT->static_path;

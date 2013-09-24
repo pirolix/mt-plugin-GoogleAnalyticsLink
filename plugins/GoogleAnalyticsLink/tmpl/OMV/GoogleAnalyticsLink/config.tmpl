@@ -3,5 +3,13 @@
     label="<__trans phrase="AWP">"
     hint="<__trans phrase="Your AWP may be found in URL of Google Analytics administration page, which format is present as 'aXXXwXXXpXXX'">"
     show_hint="1">
-    <INPUT type="text" name="awp" value="<$mt:var name="awp"$>" />
+    <INPUT type="text" name="awp" value="<$mt:var name="awp" escape="html"$>" />
+</mtapp:setting>
+
+<mtapp:setting
+    id="index"
+    label="<__trans phrase="Index Filename">"
+    hint="<__trans phrase="Specify your index filename of directory.">"
+    show_hint="1">
+    <INPUT type="text" name="index" value="<$mt:var name="index" escape="html"$>" />
 </mtapp:setting>
